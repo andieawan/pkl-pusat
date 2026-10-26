@@ -203,9 +203,9 @@ cat <<LANJUT
 
   Berikutnya (rincian: docs/PASANG-PKL.md):
    1. Atur reverse proxy (NPMplus) + DNS Cloudflare untuk ${APP_URL}
-   2. Daftarkan aplikasi PKL di Pusat:  php artisan pusat:aplikasi-baru tu --base-url=${APP_URL}
+   2. Daftarkan aplikasi PKL di Pusat:  php artisan pusat:aplikasi-baru pkl --base-url=${APP_URL}
       lalu isi PUSAT_* di .env
    3. sudo -u www-data php artisan config:clear && sudo -u www-data php artisan pkl:periksa
-   4. sudo -u www-data php artisan pkl:sinkron   (salin kelas, siswa, guru & staf)
+   4. sudo -u www-data php artisan pkl:sinkron   (salin kelas, siswa, guru)
    5. (opsional) admin darurat: sudo -u www-data php artisan pkl:buat-admin <username>
 LANJUT
