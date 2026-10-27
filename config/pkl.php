@@ -17,6 +17,21 @@ return [
     'jurnal_tertunda_hari' => (int) env('PKL_JURNAL_TERTUNDA_HARI', 3), // peringatan jurnal belum diisi
     'koordinator' => env('PKL_KOORDINATOR', ''),                // nama koordinator PKL di surat/sertifikat
 
+    // ---- Sambungan ke aplikasi lain ----
+    // Kunci API untuk aplikasi yang MEMBACA data PKL (BK). Buat acak: openssl rand -hex 32. Kosong = API tertutup.
+    'api_kunci' => array_filter(['bk' => env('PKL_API_KUNCI_BK', '')]),
+    // Batas "perlu perhatian" untuk BK: alpa + hari kerja tanpa keterangan.
+    'batas_perhatian' => (int) env('PKL_BATAS_PERHATIAN', 3),
+    // Aplikasi TU: nomor surat pengantar/penarikan diambil dari register Surat Keluar TU.
+    'tu' => [
+        'url' => rtrim((string) env('TU_URL', ''), '/') !== '' && ! preg_match('#^https?://#i', (string) env('TU_URL')) ? 'https://'.rtrim((string) env('TU_URL'), '/') : rtrim((string) env('TU_URL', ''), '/'),
+        'api_key' => env('TU_API_KEY', ''),
+        'verify_ssl' => (bool) env('TU_VERIFY_SSL', true),
+        'timeout' => (int) env('TU_TIMEOUT', 10),
+    ],
+    // Halaman publik daftar mitra DUDI (dibaca Website). false = ditutup.
+    'mitra_publik' => (bool) env('PKL_MITRA_PUBLIK', true),
+
     // Identitas pada kop surat (sama dengan BK/TU; ubah lewat .env)
     'surat' => [
         'yayasan' => env('SURAT_YAYASAN', 'YAYASAN PENDIDIKAN ISLAM'),

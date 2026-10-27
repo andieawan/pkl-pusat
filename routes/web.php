@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\IntegrasiController;
+use App\Http\Controllers\Api\PklApiController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\Pkl\BerkasController;
@@ -14,6 +15,14 @@ use Illuminate\Support\Facades\Route;
 
 // Penerima webhook dari Pusat Sekolah (tanda tangan HMAC; tanpa CSRF — lihat bootstrap/app.php).
 Route::post('/api/pusat/webhook', PusatWebhookController::class)->middleware('throttle:120,1');
+
+// API baca-saja untuk aplikasi lain (BK: berkunci; Website: daftar mitra publik).
+Route::middleware(['kunci.api', 'throttle:120,1'])->prefix('api/v1')->group(function () {
+    Route::get('/ping', [PklApiController::class, 'ping']);
+    Route::get('/perhatian', [PklApiController::class, 'perhatian']);
+    Route::get('/siswa/{uuid}', [PklApiController::class, 'siswa'])->where('uuid', '[A-Za-z0-9-]{1,64}');
+});
+Route::get('/api/publik/mitra', [PklApiController::class, 'mitra'])->middleware('throttle:60,1');
 
 // Login: warga sekolah lewat Pusat (SSO); pembimbing industri & admin darurat dengan username + password.
 Route::middleware('guest')->group(function () {
@@ -70,11 +79,13 @@ Route::middleware(['auth', 'akun.aktif'])->group(function () {
         Route::get('/komponen-nilai', [MasterController::class, 'komponen'])->name('master.komponen');
         Route::put('/komponen-nilai', [MasterController::class, 'simpanKomponen'])->name('master.komponen.simpan');
         Route::get('/surat/{jenis}', [LaporanController::class, 'surat'])->whereIn('jenis', ['pengantar', 'penarikan'])->name('laporan.surat');
+        Route::post('/surat/{jenis}/nomor', [LaporanController::class, 'nomorSurat'])->whereIn('jenis', ['pengantar', 'penarikan'])->middleware('throttle:20,1')->name('laporan.surat.nomor');
     });
 
     Route::middleware('pkl:admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/integrasi', [IntegrasiController::class, 'index'])->name('integrasi');
         Route::post('/integrasi/uji-pusat', [IntegrasiController::class, 'ujiPusat'])->middleware('throttle:10,1')->name('integrasi.pusat');
         Route::post('/integrasi/sinkron', [IntegrasiController::class, 'sinkron'])->middleware('throttle:5,1')->name('integrasi.sinkron');
+        Route::post('/integrasi/uji-tu', [IntegrasiController::class, 'ujiTu'])->middleware('throttle:10,1')->name('integrasi.tu');
     });
 });

@@ -1,5 +1,6 @@
 @extends('layouts.app', ['title' => $title])
 @section('content')
+@yield('sebelum')
 <div class="card noprint">
     @hasSection('toolbar')
         <form method="get" class="fields">@yield('toolbar')

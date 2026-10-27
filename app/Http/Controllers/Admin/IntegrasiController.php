@@ -28,6 +28,8 @@ class IntegrasiController extends Controller
                 'otomatis' => (bool) config('pusat.sinkron_otomatis'),
                 'ruteUji' => route('admin.integrasi.pusat'), 'ruteSinkron' => route('admin.integrasi.sinkron'),
             ],
+            'tuAktif' => \App\Services\TuKlien::aktif(), 'tuUrl' => config('pkl.tu.url'),
+            'apiBk' => ! empty(config('pkl.api_kunci')['bk'] ?? ''), 'mitraUrl' => config('pkl.mitra_publik') ? url('/api/publik/mitra') : null,
         ]);
     }
 
@@ -67,4 +69,15 @@ class IntegrasiController extends Controller
         return back()->with('success', 'Sinkron selesai.')->with('hasil', $h);
     }
 
+
+    public function ujiTu()
+    {
+        try {
+            \App\Services\TuKlien::ping();
+        } catch (\RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return back()->with('success', 'Terhubung ke aplikasi TU. Kunci API benar.');
+    }
 }

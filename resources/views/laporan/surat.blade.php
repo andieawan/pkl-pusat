@@ -2,8 +2,22 @@
 @php($tgl = fn ($ymd) => \App\Support\Dates::long($ymd))
 @section('toolbar')
     <input type="hidden" name="dudi" value="{{ $dudi->id }}"><input type="hidden" name="periode" value="{{ $per->id }}">
-    <label>Nomor surat<input type="text" name="nomor" value="{{ $nomor }}" placeholder="mis. 012/PKL/{{ config('pkl.kode_surat') }}/X/2026"></label>
     <label>Tempat surat<input type="text" name="tempat" value="{{ $tempat }}"></label>
+@endsection
+@section('sebelum')
+<div class="card noprint">
+    @if($arsip)
+        <p>Nomor surat: <b class="mono">{{ $arsip->nomor }}</b> · {{ $arsip->sumber === 'tu' ? 'dari register Surat Keluar TU (agenda '.$arsip->agenda_tu.')' : 'diisi manual' }}, tanggal {{ \App\Support\Dates::human($arsip->tanggal) }}.</p>
+    @else
+        <form method="post" action="{{ route('laporan.surat.nomor', $jenis) }}" class="row" style="flex-wrap:wrap;gap:8px;align-items:end">@csrf
+            <input type="hidden" name="dudi" value="{{ $dudi->id }}"><input type="hidden" name="periode" value="{{ $per->id }}">
+            @if($tuAktif)<button class="btn btn-pri" data-busy="Meminta nomor…">Ambil nomor dari TU</button><span class="mut">atau</span>@endif
+            <label style="margin:0">Nomor manual<input type="text" name="nomor" placeholder="mis. 012/PKL/{{ config('pkl.kode_surat') }}/X/2026"></label>
+            <button class="btn" name="manual" value="1">Simpan nomor</button>
+        </form>
+        <small class="mut">Surat belum bernomor. @if($tuAktif)Nomor dari TU otomatis tercatat di register Surat Keluar TU.@else Sambungkan ke TU (TU_URL & TU_API_KEY) agar nomor diambil otomatis.@endif</small>
+    @endif
+</div>
 @endsection
 @section('letter')
 @include('surat._kop')
@@ -27,7 +41,7 @@
     <p>Kami mengucapkan terima kasih atas kesempatan, bimbingan, dan kerja sama yang telah diberikan selama siswa kami melaksanakan PKL. Mohon kesediaan Bapak/Ibu mengisi penilaian siswa.</p>
 @endif
 <p>Demikian surat ini kami sampaikan. Atas perhatian dan kerja samanya kami ucapkan terima kasih.</p>
-<p style="text-align:right;margin-top:24px">{{ $tempat ?: '........................' }}, {{ $tgl(\App\Support\Dates::today()) }}</p>
+<p style="text-align:right;margin-top:24px">{{ $tempat ?: '........................' }}, {{ $tgl($tanggal) }}</p>
 <div class="ttd"><div>@if(config('pkl.koordinator'))Koordinator PKL,<div class="sp"></div><b><u>{{ config('pkl.koordinator') }}</u></b>@endif</div>
     <div>Kepala Sekolah,<div class="sp"></div><b><u>{{ $cfg['kepsek'] }}</u></b><br>NUPTK. {{ $cfg['kepsek_nuptk'] }}</div></div>
 @endsection

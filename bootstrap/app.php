@@ -18,7 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Proxy tepercaya (TRUSTED_PROXIES) dipasang di AppServiceProvider dari config: callback ini berjalan
         // sebelum .env dimuat, sehingga env() di sini selalu kosong.
-        $middleware->alias(['akun.aktif' => AkunAktif::class, 'pkl' => HanyaPkl::class]);
+        $middleware->alias(['akun.aktif' => AkunAktif::class, 'pkl' => HanyaPkl::class, 'kunci.api' => \App\Http\Middleware\KunciApi::class]);
         $middleware->validateCsrfTokens(except: ['api/pusat/webhook']); // dipanggil server Pusat; diamankan tanda tangan HMAC
         $middleware->appendToGroup('web', HeaderKeamanan::class);
         $middleware->redirectGuestsTo(fn () => route('login'));
