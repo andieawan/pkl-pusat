@@ -10,7 +10,7 @@
 @section('content')
 <div class="noprint" style="text-align:center;margin:12px"><button class="btn btn-pri" onclick="window.print()">Cetak / Simpan PDF</button> <small>Atur kertas A4 mendatar (landscape).</small></div>
 <div class="serti">
-    <div style="display:flex;align-items:center;gap:14px;justify-content:center"><img src="{{ asset('assets/logo-ibu.png') }}" alt="" width="70" height="70"><div><b>{{ $cfg['yayasan'] }} {{ $cfg['yayasan2'] }}</b><br><b style="font-size:15pt">{{ $cfg['nama'] }}</b><br><small>{{ $cfg['alamat'] }}</small></div></div>
+    <div style="display:flex;align-items:center;gap:14px;justify-content:center"><img src="{{ route('logo.sekolah') }}" alt="" width="70" height="70"><div><b>{{ $cfg['yayasan'] }} {{ $cfg['yayasan2'] }}</b><br><b style="font-size:15pt">{{ $cfg['nama'] }}</b><br><small>{{ $cfg['alamat'] }}</small></div></div>
     <h1>SERTIFIKAT</h1><div>PRAKTIK KERJA LAPANGAN</div>
     <p style="margin-top:14px">Diberikan kepada:</p>
     <div class="nm">{{ $p->siswa->nama ?? '-' }}</div>
