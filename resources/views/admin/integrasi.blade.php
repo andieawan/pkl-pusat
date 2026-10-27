@@ -1,6 +1,6 @@
 @extends('layouts.app', ['title' => 'Integrasi'])
 @section('content')
-<div class="head"><div><h1>Integrasi</h1><small>Sambungan ke Pusat Sekolah: akun, data induk (kelas, siswa, guru & staf), dan mutasi siswa.</small></div></div>
+<div class="head"><div><h1>Integrasi</h1><small>Sambungan ke Pusat Sekolah: akun serta data induk (kelas, siswa, guru) yang dipakai di PKL.</small></div></div>
 @if($perluSinkron)<div class="alert alert-warn"><span class="alert-txt">Ada perubahan dari Pusat yang belum lengkap (mis. siswa dipindah ke kelas baru yang belum tersalin). Klik <b>Sinkron sekarang</b>; bila tidak, sinkron berjalan otomatis dalam satu jam.</span></div>@endif
 <div class="card"><h2>Pusat Sekolah</h2>
     <p>Status: @if($pusatAktif && $siap)<span class="badge b-ok">Aktif</span>@elseif($pusatAktif)<span class="badge b-warn">Aktif, database belum diperbarui</span>@else<span class="badge">Nonaktif (PUSAT_ENABLED=false)</span>@endif</p>
