@@ -22,7 +22,7 @@ class TuKlien
     private static function periksa($res): array
     {
         if ($res->status() === 401) {
-            throw new RuntimeException('Kunci API TU salah (samakan TU_API_KEY di PKL dengan TU_API_KUNCI_PKL di TU).');
+            throw new RuntimeException('Kunci API TU ditolak. Di Pusat → Administrasi → Sambungan klik "Kirim ulang" pada PKL ↔ TU (pastikan aplikasi TU sudah diperbarui).');
         }
         if (! $res->successful()) {
             throw new RuntimeException((string) ($res->json('error.pesan') ?: 'TU membalas HTTP '.$res->status().'.'));
@@ -34,7 +34,7 @@ class TuKlien
     public static function ping(): array
     {
         if (! self::aktif()) {
-            throw new RuntimeException('Sambungan ke TU belum diatur (TU_URL dan TU_API_KEY di .env).');
+            throw new RuntimeException('Sambungan ke TU belum diatur. Nyalakan "PKL ↔ TU" di Pusat → Administrasi → Sambungan.');
         }
         try {
             return self::periksa(self::http()->get('/ping'));
@@ -42,7 +42,7 @@ class TuKlien
             throw $e;
         } catch (\Throwable $e) {
             report($e);
-            throw new RuntimeException('Aplikasi TU tidak dapat dihubungi. Periksa TU_URL dan jaringan.');
+            throw new RuntimeException('Aplikasi TU tidak dapat dihubungi. Pastikan aplikasi TU menyala dan alamatnya di Pusat → Aplikasi benar.');
         }
     }
 
@@ -50,13 +50,13 @@ class TuKlien
     public static function suratKeluar(string $ref, string $tanggal, string $pihak, string $perihal, string $isi, string $petugas): array
     {
         if (! self::aktif()) {
-            throw new RuntimeException('Sambungan ke TU belum diatur (TU_URL dan TU_API_KEY di .env).');
+            throw new RuntimeException('Sambungan ke TU belum diatur. Nyalakan "PKL ↔ TU" di Pusat → Administrasi → Sambungan.');
         }
         try {
             $res = self::http()->post('/surat-keluar', compact('ref', 'tanggal', 'pihak', 'perihal', 'isi', 'petugas'));
         } catch (\Throwable $e) {
             report($e);
-            throw new RuntimeException('Aplikasi TU tidak dapat dihubungi. Periksa TU_URL dan jaringan.');
+            throw new RuntimeException('Aplikasi TU tidak dapat dihubungi. Pastikan aplikasi TU menyala dan alamatnya di Pusat → Aplikasi benar.');
         }
 
         return self::periksa($res);
