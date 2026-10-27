@@ -191,4 +191,47 @@ class PklTest extends TestCase
         $this->actingAs($this->budi)->get('/saya')->assertOk()->assertSee('bukan masa PKL');
         $this->post('/saya/absen', ['aksi' => 'masuk', 'foto' => UploadedFile::fake()->image('a.jpg')])->assertSessionHas('error');
     }
+
+    public function test_akun_pusat_tidak_mengambil_alih_akun_industri(): void
+    {
+        $this->post('/pembimbing-industri', ['dudi_id' => $this->dudi->id, 'nama' => 'Pak Andi', 'username' => 'andi']);
+        [$u, $err] = \App\Services\PusatAkun::masuk(['sub' => 'uuid-andi', 'username' => 'andi', 'nama' => 'Andi Siswa', 'peran' => ['siswa'], 'siswa' => ['uuid' => 's9']]);
+        $this->assertNull($u);
+        $this->assertStringContainsString('pembimbing industri', $err);
+        $this->assertSame(['industri'], User::where('username', 'andi')->first()->roles);
+    }
+
+    public function test_akun_industri_bisa_dinonaktifkan(): void
+    {
+        $this->post('/pembimbing-industri', ['dudi_id' => $this->dudi->id, 'nama' => 'Pak Industri', 'username' => 'pak.ind']);
+        $pw = session('akun_baru')['password'];
+        $pi = PembimbingIndustri::firstOrFail();
+        $this->put('/pembimbing-industri/'.$pi->id, ['dudi_id' => $this->dudi->id, 'nama' => 'Pak Industri', 'username' => 'pak.ind', 'akun_aktif' => '0'])->assertSessionHas('success');
+        $this->assertFalse(User::where('username', 'pak.ind')->first()->aktif);
+        auth()->logout();
+        $this->post('/login', ['username' => 'pak.ind', 'password' => $pw])->assertSessionHasErrors('username');
+        $this->actingAs($this->kor)->put('/pembimbing-industri/'.$pi->id, ['dudi_id' => $this->dudi->id, 'nama' => 'Pak Industri', 'username' => 'pak.ind', 'akun_aktif' => '1']);
+        $this->assertTrue(User::where('username', 'pak.ind')->first()->aktif);
+    }
+
+    public function test_jurnal_tertunda_dihitung_dari_hari_kerja(): void
+    {
+        // Penempatan mulai 10 hari lalu, semua hari kerja; belum ada jurnal sama sekali → 10 hari tertunda (kemarin s.d. hari pertama)
+        $this->assertSame(10, \App\Services\JurnalService::tertunda($this->p1->fresh('dudi')));
+        Jurnal::create(['penempatan_id' => $this->p1->id, 'tanggal' => date('Y-m-d', strtotime(Dates::today().' -3 days')), 'kegiatan' => 'Belajar crimping kabel', 'status' => 'diajukan']);
+        Absensi::create(['penempatan_id' => $this->p1->id, 'tanggal' => date('Y-m-d', strtotime(Dates::today().' -1 day')), 'status' => 'S', 'keterangan' => 'demam', 'sumber' => 'siswa']);
+        $this->assertSame(1, \App\Services\JurnalService::tertunda($this->p1->fresh('dudi'))); // hanya H-2 (H-1 sakit, H-3 ada jurnal)
+        $this->actingAs($this->budi)->get('/saya')->assertOk();
+        $this->actingAs($this->guru)->get('/')->assertOk()->assertSee('Jurnal 10 hari'); // Ani
+    }
+
+    public function test_hari_ini_belum_dihitung_kosong_selama_jam_kerja(): void
+    {
+        $this->dudi->update(['jam_pulang' => '23:59']);
+        $r = \App\Services\AbsensiService::rekap($this->p1->fresh(['dudi', 'absensi']));
+        $this->assertSame(10, $r['hari']); // 10 hari lalu s.d. kemarin; hari ini belum selesai
+        $this->dudi->update(['jam_pulang' => '00:00']);
+        $r = \App\Services\AbsensiService::rekap($this->p1->fresh(['dudi', 'absensi']));
+        $this->assertSame(11, $r['hari']);
+    }
 }

@@ -8,7 +8,7 @@
     <div class="kpi"><small>Sedang PKL hari ini</small><div class="n"><?php echo e($aktif->count()); ?></div><small>dari <?php echo e($totalPenempatan); ?> penempatan</small></div>
     <div class="kpi"><small>Sudah absen masuk</small><div class="n ok"><?php echo e($hadir); ?></div><small><?php echo e($absen->whereIn('status', ['I', 'S'])->count()); ?> izin/sakit · <?php echo e($absen->where('terlambat', true)->count()); ?> terlambat</small></div>
     <div class="kpi"><small>Belum absen</small><div class="n <?php echo e($belum ? 'warn' : 'ok'); ?>"><?php echo e($belum); ?></div></div>
-    <div class="kpi"><small>Perlu diperiksa</small><div class="n <?php echo e($perluDicek + $jurnalMenunggu ? 'warn' : 'ok'); ?>"><?php echo e($perluDicek + $jurnalMenunggu); ?></div><small><?php echo e($perluDicek); ?> absensi · <?php echo e($jurnalMenunggu); ?> jurnal</small></div>
+    <div class="kpi"><small>Perlu diperiksa</small><div class="n <?php echo e($perluDicek + $jurnalMenunggu ? 'warn' : 'ok'); ?>"><?php echo e($perluDicek + $jurnalMenunggu); ?></div><small><?php echo e($perluDicek); ?> absensi · <?php echo e($jurnalMenunggu); ?> jurnal <?php if($tertunda->isNotEmpty()): ?> · <?php echo e($tertunda->count()); ?> siswa jurnal tertunda <?php endif; ?></small></div>
 </div>
 
 <div class="quick">
@@ -24,6 +24,7 @@
         <?php ($a = $absen[$p->id] ?? null); ?>
         <a class="stu" style="color:inherit" href="<?php echo e(route('bimbingan.show', $p)); ?>">
             <span class="nm"><b><?php echo e($p->siswa->nama ?? '-'); ?></b><small><?php echo e($p->siswa->kelas->nama ?? ''); ?> · <?php echo e($p->dudi->nama ?? '-'); ?><?php if($a?->jam_masuk): ?> · masuk <?php echo e($a->jam_masuk); ?><?php endif; ?> <?php if($a?->jam_pulang): ?>– pulang <?php echo e($a->jam_pulang); ?><?php endif; ?></small></span>
+            <?php if(isset($tertunda[$p->id])): ?><span class="badge b-warn" title="Hari kerja berturut-turut tanpa jurnal">Jurnal <?php echo e($tertunda[$p->id]); ?> hari</span><?php endif; ?>
             <?php if($a): ?>
                 <?php if($a->perlu_dicek): ?><span class="badge b-warn" title="Lokasi di luar area DUDI atau tidak terbaca">Cek lokasi</span><?php endif; ?>
                 <?php if($a->terlambat): ?><span class="badge b-warn">Terlambat</span><?php endif; ?>

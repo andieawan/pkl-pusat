@@ -13,7 +13,7 @@
 <?php $__empty_1 = true; $__currentLoopData = $list; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pi): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
     <details class="stu" style="display:block">
         <summary style="display:flex;gap:10px;align-items:center;cursor:pointer"><span class="nm" style="flex:1"><b><?php echo e($pi->nama); ?></b><small><?php echo e($pi->dudi->nama ?? '-'); ?><?php echo e($pi->jabatan ? ' · '.$pi->jabatan : ''); ?><?php echo e($pi->telp ? ' · '.$pi->telp : ''); ?></small></span>
-            <?php if($pi->user): ?><span class="badge b-ok"><?php echo e('@'.$pi->user->username); ?></span><?php else: ?><span class="badge">Tanpa akun</span><?php endif; ?></summary>
+            <?php if($pi->user && $pi->user->aktif): ?><span class="badge b-ok"><?php echo e('@'.$pi->user->username); ?></span><?php elseif($pi->user): ?><span class="badge b-bad"><?php echo e('@'.$pi->user->username); ?> · nonaktif</span><?php else: ?><span class="badge">Tanpa akun</span><?php endif; ?></summary>
         <form method="post" action="<?php echo e(route('master.pembimbing.ubah', $pi)); ?>" style="margin-top:12px"><?php echo csrf_field(); ?> <?php echo method_field('PUT'); ?> <?php echo $__env->make('master._pembimbing-form', ['pi' => $pi], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?></form>
     </details>
 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>

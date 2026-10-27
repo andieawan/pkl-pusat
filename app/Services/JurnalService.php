@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Exceptions\UserError;
+use App\Models\Absensi;
 use App\Models\Jurnal;
 use App\Models\Kunjungan;
 use App\Models\Penempatan;
@@ -43,6 +44,36 @@ class JurnalService
         $j->fill($data)->save();
 
         return $j;
+    }
+
+    /**
+     * Jumlah hari kerja berturut-turut (mundur dari kemarin, maks. 30 hari) yang belum ada jurnalnya.
+     * Hari izin/sakit/alpa tidak dihitung. $jurnal/$absen: tanggal => true (opsional, untuk banyak siswa sekaligus).
+     */
+    public static function tertunda(Penempatan $p, ?array $jurnal = null, ?array $absen = null): int
+    {
+        $dari = date('Y-m-d', strtotime(Dates::today().' -31 days'));
+        $jurnal ??= Jurnal::where('penempatan_id', $p->id)->whereDate('tanggal', '>=', $dari)->pluck('tanggal')->mapWithKeys(fn ($t) => [$t->format('Y-m-d') => true])->all();
+        $absen ??= Absensi::where('penempatan_id', $p->id)->where('status', '!=', 'H')->whereDate('tanggal', '>=', $dari)->pluck('tanggal')->mapWithKeys(fn ($t) => [$t->format('Y-m-d') => true])->all();
+        $kerja = $p->dudi?->hariKerja() ?? [1, 2, 3, 4, 5, 6];
+        $mulai = $p->mulai->format('Y-m-d');
+        $selesai = $p->selesai->format('Y-m-d');
+        $n = 0;
+        for ($i = 1; $i <= 30; $i++) {
+            $t = date('Y-m-d', strtotime(Dates::today()." -$i days"));
+            if ($t < $mulai) {
+                break;
+            }
+            if ($t > $selesai || ! in_array(Dates::weekday($t) ?: 7, $kerja, true) || isset($absen[$t])) {
+                continue;
+            }
+            if (isset($jurnal[$t])) {
+                break;
+            }
+            $n++;
+        }
+
+        return $n;
     }
 
     /** Setujui / minta revisi banyak jurnal. @return int */

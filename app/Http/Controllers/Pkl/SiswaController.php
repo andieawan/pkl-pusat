@@ -30,6 +30,7 @@ class SiswaController extends Controller
             'jurnalHariIni' => $p ? Jurnal::where('penempatan_id', $p->id)->whereDate('tanggal', Dates::today())->first() : null,
             'rekap' => $terakhir ? AbsensiService::rekap($terakhir) : null,
             'revisi' => $terakhir ? Jurnal::where('penempatan_id', $terakhir->id)->where('status', 'revisi')->count() : 0,
+            'tertunda' => $p ? JurnalService::tertunda($p) : 0,
         ]);
     }
 

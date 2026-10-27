@@ -1,5 +1,6 @@
 <?php $__env->startSection('content'); ?>
 <div class="head"><div><h1>Absen PKL</h1><small><?php echo e(\App\Support\Dates::long($hari)); ?></small></div></div>
+<?php if($tertunda >= max(1, (int) config('pkl.jurnal_tertunda_hari'))): ?><div class="alert alert-warn"><span class="alert-ic" aria-hidden="true">!</span><span class="alert-txt">Jurnal <b><?php echo e($tertunda); ?> hari kerja</b> terakhir belum diisi. <a href="<?php echo e(route('siswa.jurnal', ['tanggal' => date('Y-m-d', strtotime($hari.' -1 day'))])); ?>"><b>Isi jurnal</b></a></span></div><?php endif; ?>
 <?php if($revisi): ?><div class="alert alert-warn"><span class="alert-ic" aria-hidden="true">!</span><span class="alert-txt"><?php echo e($revisi); ?> jurnal perlu diperbaiki. <a href="<?php echo e(route('siswa.jurnal')); ?>"><b>Buka jurnal</b></a></span></div><?php endif; ?>
 
 <?php if(! $p): ?>

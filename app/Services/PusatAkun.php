@@ -29,6 +29,12 @@ class PusatAkun
             if ($kandidat && $kandidat->pusat_uuid !== null) {
                 return [null, 'Username sudah tertaut ke akun Pusat lain. Hubungi administrator.'];
             }
+            // Akun pembimbing industri (akun lokal milik orang luar sekolah) tidak boleh diambil alih akun Pusat yang kebetulan sama username-nya.
+            if ($kandidat && $kandidat->hasRole('industri')) {
+                Audit::catat('Login Pusat ditolak', (string) ($info['nama'] ?? $username), "Username \"$username\" sudah dipakai akun pembimbing industri");
+
+                return [null, "Username \"$username\" sudah dipakai akun pembimbing industri di aplikasi PKL. Minta koordinator PKL mengganti username akun industri itu."];
+            }
             $user = $kandidat; // penautan pertama lewat username yang sama (mis. admin lokal darurat)
         }
 

@@ -14,7 +14,7 @@
 @forelse($list as $pi)
     <details class="stu" style="display:block">
         <summary style="display:flex;gap:10px;align-items:center;cursor:pointer"><span class="nm" style="flex:1"><b>{{ $pi->nama }}</b><small>{{ $pi->dudi->nama ?? '-' }}{{ $pi->jabatan ? ' · '.$pi->jabatan : '' }}{{ $pi->telp ? ' · '.$pi->telp : '' }}</small></span>
-            @if($pi->user)<span class="badge b-ok">{{ '@'.$pi->user->username }}</span>@else<span class="badge">Tanpa akun</span>@endif</summary>
+            @if($pi->user && $pi->user->aktif)<span class="badge b-ok">{{ '@'.$pi->user->username }}</span>@elseif($pi->user)<span class="badge b-bad">{{ '@'.$pi->user->username }} · nonaktif</span>@else<span class="badge">Tanpa akun</span>@endif</summary>
         <form method="post" action="{{ route('master.pembimbing.ubah', $pi) }}" style="margin-top:12px">@csrf @method('PUT') @include('master._pembimbing-form', ['pi' => $pi])</form>
     </details>
 @empty

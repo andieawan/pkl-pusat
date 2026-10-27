@@ -6,6 +6,10 @@
     <div class="field"><label>Telepon / WA</label><input type="tel" name="telp" value="<?php echo e($pi->telp ?? ''); ?>" maxlength="30"></div>
     <div class="field"><label>Username login</label><input type="text" name="username" value="<?php echo e($pi?->user?->username); ?>" pattern="[a-z0-9._\-]{3,60}" autocapitalize="none" placeholder="<?php echo e($pi?->user ? '' : 'kosongkan bila tanpa akun'); ?>"></div>
 </div>
-<?php if($pi?->user): ?><label class="chk"><input type="checkbox" name="reset_password" value="1"> Buat password baru</label><?php endif; ?>
+<?php if($pi?->user): ?>
+    <input type="hidden" name="akun_aktif" value="0">
+    <label class="chk"><input type="checkbox" name="akun_aktif" value="1" <?php if($pi->user->aktif): echo 'checked'; endif; ?>> Akun boleh login</label>
+    <label class="chk"><input type="checkbox" name="reset_password" value="1"> Buat password baru</label>
+<?php endif; ?>
 <button class="btn btn-pri" style="margin-top:8px">Simpan</button>
 <?php /**PATH /home/claude/pkl-pusat/resources/views/master/_pembimbing-form.blade.php ENDPATH**/ ?>

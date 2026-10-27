@@ -1,6 +1,7 @@
 @extends('layouts.app', ['title' => 'Absen PKL'])
 @section('content')
 <div class="head"><div><h1>Absen PKL</h1><small>{{ \App\Support\Dates::long($hari) }}</small></div></div>
+@if($tertunda >= max(1, (int) config('pkl.jurnal_tertunda_hari')))<div class="alert alert-warn"><span class="alert-ic" aria-hidden="true">!</span><span class="alert-txt">Jurnal <b>{{ $tertunda }} hari kerja</b> terakhir belum diisi. <a href="{{ route('siswa.jurnal', ['tanggal' => date('Y-m-d', strtotime($hari.' -1 day'))]) }}"><b>Isi jurnal</b></a></span></div>@endif
 @if($revisi)<div class="alert alert-warn"><span class="alert-ic" aria-hidden="true">!</span><span class="alert-txt">{{ $revisi }} jurnal perlu diperbaiki. <a href="{{ route('siswa.jurnal') }}"><b>Buka jurnal</b></a></span></div>@endif
 
 @if(! $p)

@@ -6,5 +6,9 @@
     <div class="field"><label>Telepon / WA</label><input type="tel" name="telp" value="{{ $pi->telp ?? '' }}" maxlength="30"></div>
     <div class="field"><label>Username login</label><input type="text" name="username" value="{{ $pi?->user?->username }}" pattern="[a-z0-9._\-]{3,60}" autocapitalize="none" placeholder="{{ $pi?->user ? '' : 'kosongkan bila tanpa akun' }}"></div>
 </div>
-@if($pi?->user)<label class="chk"><input type="checkbox" name="reset_password" value="1"> Buat password baru</label>@endif
+@if($pi?->user)
+    <input type="hidden" name="akun_aktif" value="0">
+    <label class="chk"><input type="checkbox" name="akun_aktif" value="1" @checked($pi->user->aktif)> Akun boleh login</label>
+    <label class="chk"><input type="checkbox" name="reset_password" value="1"> Buat password baru</label>
+@endif
 <button class="btn btn-pri" style="margin-top:8px">Simpan</button>

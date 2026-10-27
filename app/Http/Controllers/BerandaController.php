@@ -20,9 +20,18 @@ class BerandaController extends Controller
                 ->with(['siswa.kelas', 'dudi'])->get()->sortBy(fn ($p) => $p->siswa->nama ?? '')->values();
             $ids = Akses::penempatan($u)->pluck('id');
             $absenHariIni = Absensi::whereIn('penempatan_id', $aktif->pluck('id'))->whereDate('tanggal', $hari)->get()->keyBy('penempatan_id');
+            // Jurnal tertunda per siswa (2 kueri untuk semua siswa, bukan per siswa)
+            $dari = date('Y-m-d', strtotime($hari.' -31 days'));
+            $peta = fn ($q) => $q->whereIn('penempatan_id', $aktif->pluck('id'))->whereDate('tanggal', '>=', $dari)->get(['penempatan_id', 'tanggal'])
+                ->groupBy('penempatan_id')->map(fn ($g) => $g->mapWithKeys(fn ($r) => [$r->tanggal->format('Y-m-d') => true])->all());
+            $jurnal = $peta(Jurnal::query());
+            $libur = $peta(Absensi::where('status', '!=', 'H'));
+            $batas = max(1, (int) config('pkl.jurnal_tertunda_hari'));
+            $tertunda = $aktif->mapWithKeys(fn ($p) => [$p->id => \App\Services\JurnalService::tertunda($p, $jurnal[$p->id] ?? [], $libur[$p->id] ?? [])])
+                ->filter(fn ($n) => $n >= $batas);
 
             return view('beranda', [
-                'aktif' => $aktif, 'absen' => $absenHariIni, 'hari' => $hari,
+                'aktif' => $aktif, 'absen' => $absenHariIni, 'hari' => $hari, 'tertunda' => $tertunda,
                 'perluDicek' => Absensi::whereIn('penempatan_id', $ids)->where(fn ($q) => $q->where('perlu_dicek', true)->orWhere(fn ($w) => $w->whereIn('status', ['I', 'S'])->whereNull('verifikasi')))->count(),
                 'jurnalMenunggu' => Jurnal::whereIn('penempatan_id', $ids)->where('status', 'diajukan')->count(),
                 'totalPenempatan' => $u->isPengelola() ? Penempatan::count() : $ids->count(),

@@ -196,6 +196,12 @@ class AbsensiService
             $c['T'] += $r->terlambat ? 1 : 0;
         }
         $hari = self::hariKerja($p);
+        // Hari ini belum dihitung "tanpa keterangan" selama jam kerja DUDI belum selesai dan siswa belum tercatat apa pun.
+        $kini = Dates::today();
+        if ($hari > 0 && $p->berjalan($kini) && in_array(Dates::weekday($kini) ?: 7, $p->dudi?->hariKerja() ?? [1, 2, 3, 4, 5, 6], true)
+            && self::nowHm() < ($p->dudi?->jam_pulang ?: '16:00') && ! $rows->contains(fn ($r) => $r->tanggal?->format('Y-m-d') === $kini)) {
+            $hari--;
+        }
         $tercatat = $c['H'] + $c['I'] + $c['S'] + $c['A'];
 
         return $c + ['kosong' => max(0, $hari - $tercatat), 'hari' => $hari, 'persen' => $hari ? round($c['H'] / $hari * 100, 1) : null];

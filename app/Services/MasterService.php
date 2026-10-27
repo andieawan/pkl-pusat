@@ -79,6 +79,13 @@ class MasterService
                 [$akun, $password] = self::akunIndustri($pi, $username, ! empty($in['reset_password']));
                 $pi->update(['user_id' => $akun->id]);
             }
+            if ($pi->user && array_key_exists('akun_aktif', $in)) {
+                $aktif = (bool) (int) $in['akun_aktif'];
+                if ($pi->user->aktif !== $aktif) {
+                    $pi->user->update(['aktif' => $aktif]);
+                    Audit::catat($aktif ? 'Aktifkan akun industri' : 'Nonaktifkan akun industri', $u->nama, $pi->nama);
+                }
+            }
             Audit::catat('Simpan pembimbing industri', $u->nama, $pi->nama.($password ? ' (akun/password baru)' : ''));
 
             return [$pi, $password];
