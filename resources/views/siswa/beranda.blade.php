@@ -53,7 +53,7 @@
 
     <div class="quick">
         <a class="quick-item {{ $jurnalHariIni ? '' : 'primary' }}" href="{{ route('siswa.jurnal') }}"><span class="bk-ic" aria-hidden="true">📝</span><span><b>Jurnal hari ini</b><small>{{ $jurnalHariIni ? \App\Models\Jurnal::STATUS[$jurnalHariIni->status] : 'Belum diisi' }}</small></span></a>
-        <a class="quick-item" href="{{ route('siswa.riwayat') }}"><span class="bk-ic" aria-hidden="true">🗓</span><span><b>Riwayat absen</b><small>@if($rekap){{ $rekap['H'] }} hadir dari {{ $rekap['hari'] }} hari kerja @endif</small></span></a>
+        <a class="quick-item" href="{{ route('siswa.riwayat') }}"><span class="bk-ic" aria-hidden="true">📅</span><span><b>Riwayat absen</b><small>@if($rekap){{ $rekap['H'] }} hadir dari {{ $rekap['hari'] }} hari kerja @endif</small></span></a>
     </div>
     @include('siswa._kartu', ['p' => $p])
 @endif
