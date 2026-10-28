@@ -5,6 +5,6 @@ Configuration: /home/runner/work/pkl-pusat/pkl-pusat/phpunit.xml
 
 ...............................                                   31 / 31 (100%)
 
-Time: 00:02.651, Memory: 62.50 MB
+Time: 00:02.422, Memory: 62.50 MB
 
 OK (31 tests, 222 assertions)
