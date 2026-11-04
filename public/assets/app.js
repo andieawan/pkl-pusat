@@ -253,20 +253,14 @@
     e.preventDefault();
     var sub = e.submitter;
     var go = function () { f.setAttribute('data-geo-done', '1'); if (sub && sub.name) f.querySelector('input[name=aksi]').value = sub.value; HTMLFormElement.prototype.submit.call(f); };
-    // data-geo-opsional: bila lokasi gagal dibaca, tawarkan kirim tanpa lokasi (server menandai "perlu dicek").
-    var opsional = f.hasAttribute('data-geo-opsional') || (sub && sub.hasAttribute('data-tanpa-geo'));
-    if (sub && sub.hasAttribute('data-tanpa-geo')) { go(); return; }
-    var gagal = function () {
-      if (busy) { busy.disabled = false; busy.textContent = busy.dataset.old; }
-      if (opsional) { if (confirm('Lokasi tidak dapat dibaca. Kirim tanpa lokasi? Pembimbing akan memeriksa absen Anda.')) go(); return; }
-      alert('Lokasi tidak dapat dibaca. Aktifkan GPS dan izinkan akses lokasi untuk situs ini (perlu alamat https://), lalu coba lagi.');
-    };
-    var busy = sub;
-    if (!navigator.geolocation) { gagal(); return; }
-    if (busy) { busy.disabled = true; busy.dataset.old = busy.textContent; busy.textContent = 'Mengambil lokasi…'; }
+    if (!navigator.geolocation) { alert('Browser ini tidak mendukung lokasi. Gunakan browser lain atau hubungi TU.'); return; }
+    var busy = sub; if (busy) { busy.disabled = true; busy.dataset.old = busy.textContent; busy.textContent = 'Mengambil lokasi…'; }
     navigator.geolocation.getCurrentPosition(function (p) {
       f.elements['lat'].value = p.coords.latitude; f.elements['lng'].value = p.coords.longitude; go();
-    }, gagal, { enableHighAccuracy: true, timeout: 15000, maximumAge: 30000 });
+    }, function () {
+      if (busy) { busy.disabled = false; busy.textContent = busy.dataset.old; }
+      alert('Lokasi tidak dapat dibaca. Aktifkan GPS dan izinkan akses lokasi untuk situs ini (perlu alamat https://), lalu coba lagi.');
+    }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 30000 });
   }, true);
 
   // ---- Isi koordinat dari lokasi saat ini: <button data-geo-fill="#lat,#lng"> ----
@@ -443,4 +437,19 @@
     b.addEventListener('scroll', function () { cek(b); }, { passive: true });
   });
   window.addEventListener('resize', function () { Array.prototype.forEach.call(bars, cek); });
+})();
+
+// Jurnal (Mengajar): tanggal / jam ke- langsung menampilkan pertemuan itu.
+(function () {
+  document.querySelectorAll('input[data-auto]').forEach(function (i) {
+    i.addEventListener('change', function () { if (i.form && (!i.pattern || i.checkValidity())) i.form.submit(); });
+  });
+})();
+(function () {
+  document.querySelectorAll('[data-isi-materi]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var t = document.getElementById('materi');
+      if (t) { t.value = b.getAttribute('data-isi-materi'); t.focus(); t.dispatchEvent(new Event('input', { bubbles: true })); }
+    });
+  });
 })();
