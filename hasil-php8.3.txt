@@ -3,8 +3,17 @@ PHPUnit 12.5.38 by Sebastian Bergmann and contributors.
 Runtime:       PHP 8.3.36
 Configuration: /home/runner/work/pkl-pusat/pkl-pusat/phpunit.xml
 
-..................................                                34 / 34 (100%)
+...............................F...                               35 / 35 (100%)
 
-Time: 00:02.835, Memory: 62.50 MB
+Time: 00:02.754, Memory: 64.50 MB
 
-OK (34 tests, 243 assertions)
+There was 1 failure:
+
+1) Tests\Feature\SemuaHalamanTest::test_semua_halaman_bisa_dibuka_tiap_peran
+siswa tidak membuka satu halaman pun
+Failed asserting that 0 is greater than 0.
+
+/home/runner/work/pkl-pusat/pkl-pusat/tests/Feature/SemuaHalamanTest.php:117
+
+FAILURES!
+Tests: 35, Assertions: 247, Failures: 1.
