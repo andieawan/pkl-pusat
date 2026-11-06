@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\Pkl\BerkasController;
 use App\Http\Controllers\Pkl\BimbinganController;
+use App\Http\Controllers\Pkl\ImporController;
 use App\Http\Controllers\Pkl\LaporanController;
 use App\Http\Controllers\Pkl\MasterController;
 use App\Http\Controllers\Pkl\SiswaController;
@@ -80,6 +81,9 @@ Route::middleware(['auth', 'akun.aktif'])->group(function () {
         Route::put('/penempatan/{penempatan}', [MasterController::class, 'ubahPenempatan'])->whereNumber('penempatan')->name('master.penempatan.ubah');
         Route::get('/komponen-nilai', [MasterController::class, 'komponen'])->name('master.komponen');
         Route::put('/komponen-nilai', [MasterController::class, 'simpanKomponen'])->name('master.komponen.simpan');
+        Route::get('/impor', [ImporController::class, 'index'])->name('master.impor');
+        Route::get('/impor/templat', [ImporController::class, 'templat'])->name('master.impor.templat');
+        Route::post('/impor', [ImporController::class, 'unggah'])->middleware('throttle:20,1')->name('master.impor.unggah');
         Route::get('/surat/{jenis}', [LaporanController::class, 'surat'])->whereIn('jenis', ['pengantar', 'penarikan'])->name('laporan.surat');
         Route::post('/surat/{jenis}/nomor', [LaporanController::class, 'nomorSurat'])->whereIn('jenis', ['pengantar', 'penarikan'])->middleware('throttle:20,1')->name('laporan.surat.nomor');
     });
